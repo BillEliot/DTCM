@@ -4,12 +4,3 @@ html, body {
     margin: 0;
     padding: 0;
 }
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-image: url('../image/bg.jpg');
-    background-repeat: no-repeat;
-    background-size:100% 100%;
-    -moz-background-size:100% 100%;
-}

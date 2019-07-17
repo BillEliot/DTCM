@@ -1,47 +1,22 @@
 <template>
-  <div  class="container text-center">
-    <h1>中医中英术语查询系统</h1>
+  <div  class="container text-center warpper">
+    <img src="~assets/image/bg.png" class="logo" />
+    <h1>中医术语中英对照查询系统</h1>
+    <p class="sub-title">A System for Chinese-English Terminology of Chinese Medicine</p>
     <a-spin :spinning="spinning">
-      <a-form
-        :form="form"
-        @submit="search"
-        layout="inline"
-        class="form"
-      >
-        <!--
-        <a-form-item label="搜索字段" v-bind="formItemLayout">
-          <a-select
-            v-decorator="[
-              'field',
-              {
-                initialValue: '中文(简体)'
-              }
-            ]"
-          >
-            <a-select-option value="中文(简体)">中文(简体)</a-select-option>
-            <a-select-option value="中文(繁体)">中文(繁体)</a-select-option>
-            <a-select-option value="拼音">拼音</a-select-option>
-          </a-select>
-        </a-form-item>
-        -->
-        <a-form-item label="关键字">
-          <a-input
-            v-decorator="[
-              'keyword',
-              {
-                rules: [{ required: true, message: '请输入搜索关键字' }],
-              }
-            ]"
-            placeholder="请输入搜索关键字"
-          />
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" html-type="submit">搜索</a-button>
-        </a-form-item>
-        <a-form-item>
-          <a-button>高级搜索</a-button>
-        </a-form-item>
-      </a-form>
+      <a-select v-model="rule" style="width: 100px">
+        <a-select-option value="中 -> 英">中 -> 英</a-select-option>
+        <a-select-option value="英 -> 中">英 -> 中</a-select-option>
+      </a-select>
+      <a-auto-complete
+        v-model="keyword"
+        :dataSource="completeResult"
+        @search="autoComplete"
+        placeholder="输入关键字"
+        :allowClear="true"
+        class="auto-complete"
+      />
+      <a-button type="primary" @click="search" style="margin-left: 10px">搜索</a-button>
     </a-spin>
   </div>
 </template>
@@ -54,23 +29,9 @@ export default {
   data() {
     return {
       spinning: false,
-      form: this.$form.createForm(this),
-      formItemLayout: {
-        labelCol: {
-          xs: { span: 24 },
-          sm: { span: 7 },
-        },
-        wrapperCol: {
-          xs: { span: 24 },
-          sm: { span: 11 },
-        },
-      },
-      tailFormItemLayout: {
-        wrapperCol: {
-          xs: { span: 24 },
-          sm: { span: 16, offset: 4 },
-        },
-      }
+      keyword: '',
+      rule: '中 -> 英',
+      completeResult: [],
     }
   },
 
@@ -79,20 +40,30 @@ export default {
       setSearchResult: 'setSearchResult'
     }),
 
-    search(e) {
-      e.preventDefault()
+    search() {
       this.spinning = true
-      this.form.validateFields((err, values) => {
-        if (!err) {
-          this.$axios.post('search', qs.stringify({
-            keyword: values.keyword
-          }))
-          .then((res) => {
-            this.spinning = false
-            this.setSearchResult(res.data.info)
-            this.$router.push({ path: '/result' })
-          })
-        }
+      if (!!this.keyword) {
+        this.$axios.post('search', qs.stringify({
+          keyword: this.keyword,
+          rule: this.rule
+        }))
+        .then((res) => {
+          this.spinning = false
+          this.setSearchResult(res.data.info)
+          this.$router.push({ path: '/result' })
+        })
+      }
+      else {
+        this.$message.error('输入些关键字吧～')
+      }
+    },
+    autoComplete(value) {
+      this.$axios.post('autoComplete', qs.stringify({
+        keyword: value,
+        rule: this.rule
+      }))
+      .then((res) => {
+        this.completeResult = res.data.info
       })
     }
   }
@@ -100,7 +71,22 @@ export default {
 </script>
 
 <style scoped>
-.form {
-  margin-top: 30px;
+.warpper {
+  margin-top: 50px;
+}
+
+.logo {
+  width: 300px;
+  height: 300px;
+}
+
+.sub-title {
+  color: lightgray;
+  font-size: 18px;
+}
+
+.auto-complete {
+  width: 600px;
+  margin-left: 10px
 }
 </style>
