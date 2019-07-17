@@ -4,7 +4,7 @@
     <h1>中医术语中英对照查询系统</h1>
     <p class="sub-title">A System for Chinese-English Terminology of Chinese Medicine</p>
     <a-spin :spinning="spinning">
-      <a-select v-model="rule" style="width: 100px">
+      <a-select v-model="rule" class="rule">
         <a-select-option value="中 -> 英">中 -> 英</a-select-option>
         <a-select-option value="英 -> 中">英 -> 中</a-select-option>
       </a-select>
@@ -88,5 +88,24 @@ export default {
 .auto-complete {
   width: 600px;
   margin-left: 10px
+}
+
+.rule {
+  width: 100px
+}
+
+@media screen and (max-width: 768px) {
+  .auto-complete {
+    width: 100px;
+  }
+}
+@media screen and (max-width: 970px) {
+  .auto-complete {
+    width: 250px;
+  }
+
+  .rule {
+    margin-bottom: 10px;
+  }
 }
 </style>

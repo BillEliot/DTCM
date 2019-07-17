@@ -1,7 +1,7 @@
 <template>
   <div class="container text-center result">
     <a-spin :spinning="spinning">
-        <a-select v-model="rule" style="width: 100px">
+        <a-select v-model="rule" class="rule">
         <a-select-option value="中 -> 英">中 -> 英</a-select-option>
         <a-select-option value="英 -> 中">英 -> 中</a-select-option>
     </a-select>
@@ -21,7 +21,14 @@
         :bordered="true"
         class="table"
     >
-        <a slot="SimplifiedName" slot-scope="text" @click="this.$router.push({ path: '/result/SimplifiedName', query: { SimplifiedName: text } })">{{ text }}</a>
+        <router-link
+            slot="SimplifiedName"
+            slot-scope="text"
+            target="_blank"
+            :to="{ path: '/result/Detail', query: { SimplifiedName: text } }"
+        >
+            {{ text }}
+        </router-link>
     </a-table>
     </a-spin>
   </div>
@@ -106,6 +113,10 @@ a {
   margin-left: 10px
 }
 
+.rule {
+  width: 100px
+}
+
 .table {
     margin-top: 20px;
 }
@@ -121,7 +132,11 @@ a {
 }
 @media screen and (max-width: 970px) {
     .auto-complete {
-        width: 300px;
+        width: 250px;
+    }
+
+    .rule {
+        margin-bottom: 10px;
     }
 }
 </style>

@@ -41,6 +41,28 @@ def search(request):
 
 
 @csrf_exempt
+def detail(request):
+    SimplifiedName = request.POST.get('SimplifiedName')
+    try:
+        entry = Entry.objects.get(SimplifiedName=SimplifiedName)
+        return JsonResponse({
+            'id': entry.id,
+            'SimplifiedName': entry.SimplifiedName,
+            'TraditionalName': entry.TraditionalName,
+            'PinyinName': entry.PinyinName,
+            'EnglishName_1': entry.EnglishName_1,
+            'EnglishName_2': entry.EnglishName_2,
+            'EnglishName_3': entry.EnglishName_3,
+            'EnglishInterpretation': entry.EnglishInterpretation,
+            'sortCode': entry.sort.code,
+            'sortName': entry.sort.name
+        })
+    except:
+        return HttpResponse(1)
+
+
+
+@csrf_exempt
 def autoComplete(request):
     keyword = request.POST.get('keyword')
     rule = request.POST.get('rule')
