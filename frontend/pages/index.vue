@@ -8,23 +8,7 @@
         layout="inline"
         class="form"
       >
-        <!--
-        <a-form-item label="搜索字段" v-bind="formItemLayout">
-          <a-select
-            v-decorator="[
-              'field',
-              {
-                initialValue: '中文(简体)'
-              }
-            ]"
-          >
-            <a-select-option value="中文(简体)">中文(简体)</a-select-option>
-            <a-select-option value="中文(繁体)">中文(繁体)</a-select-option>
-            <a-select-option value="拼音">拼音</a-select-option>
-          </a-select>
-        </a-form-item>
-        -->
-        <a-form-item label="关键字">
+        <a-form-item :wrapper-col="{ span: 24 }">
           <a-input
             v-decorator="[
               'keyword',
@@ -37,9 +21,6 @@
         </a-form-item>
         <a-form-item>
           <a-button type="primary" html-type="submit">搜索</a-button>
-        </a-form-item>
-        <a-form-item>
-          <a-button>高级搜索</a-button>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -81,9 +62,9 @@ export default {
 
     search(e) {
       e.preventDefault()
-      this.spinning = true
       this.form.validateFields((err, values) => {
         if (!err) {
+          this.spinning = true
           this.$axios.post('search', qs.stringify({
             keyword: values.keyword
           }))

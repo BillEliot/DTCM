@@ -19,12 +19,10 @@
             />
             </a-form-item>
             <a-form-item>
-            <a-button type="primary" html-type="submit">搜索</a-button>
-            </a-form-item>
-            <a-form-item>
-            <a-button>高级搜索</a-button>
+                <a-button type="primary" html-type="submit">搜索</a-button>
             </a-form-item>
         </a-form>
+        <p class="summary text-left">共检索出{{ result.length }}条数据</p>
         <a-table
             :columns="columns"
             :dataSource="result"
@@ -96,16 +94,16 @@ export default {
   methods: {
       search(e) {
           e.preventDefault()
-          this.spinning = true
           this.form.validateFields((err, values) => {
               if (!err) {
-              this.$axios.post('search', qs.stringify({
-                  keyword: values.keyword
-              }))
-              .then((res) => {
-                  this.spinning = false
-                  this.result = res.data.info
-              })
+                  this.spinning = true
+                  this.$axios.post('search', qs.stringify({
+                      keyword: values.keyword
+                  }))
+                .then((res) => {
+                    this.spinning = false
+                    this.result = res.data.info
+                })
             }
         })
       }
@@ -114,6 +112,11 @@ export default {
 </script>
 
 <style scoped>
+.summary {
+    color: red;
+    font-weight: bold;
+}
+
 .table {
     background-color: white;
 }
