@@ -1,37 +1,36 @@
 <template>
-  <div class="container text-center">
-      <a-spin :spinning="spinning">
-        <a-form
-            :form="form"
-            @submit="search"
-            layout="inline"
-            class="text-left"
+  <div class="container text-center result">
+    <a-spin :spinning="spinning">
+        <a-select v-model="rule" class="rule">
+        <a-select-option value="中 -> 英">中 -> 英</a-select-option>
+        <a-select-option value="英 -> 中">英 -> 中</a-select-option>
+    </a-select>
+    <a-auto-complete
+        v-model="keyword"
+        :dataSource="completeResult"
+        @search="autoComplete"
+        placeholder="输入关键字"
+        :allowClear="true"
+        class="auto-complete"
+    />
+    <a-button type="primary" @click="search" style="margin-left: 10px">搜索</a-button>
+    <a-table
+        :columns="columns"
+        :dataSource="result"
+        :rowKey="result => result.id"
+        :bordered="true"
+        class="table"
+    >
+        <router-link
+            slot="SimplifiedName"
+            slot-scope="text"
+            target="_blank"
+            :to="{ path: '/result/Detail', query: { SimplifiedName: text } }"
         >
-            <a-form-item label="关键字">
-            <a-input
-                v-decorator="[
-                'keyword',
-                {
-                    rules: [{ required: true, message: '请输入搜索关键字' }],
-                }
-                ]"
-                placeholder="请输入搜索关键字"
-            />
-            </a-form-item>
-            <a-form-item>
-                <a-button type="primary" html-type="submit">搜索</a-button>
-            </a-form-item>
-        </a-form>
-        <p class="summary text-left">共检索出{{ result.length }}条数据</p>
-        <a-table
-            :columns="columns"
-            :dataSource="result"
-            :rowKey="result => result.id"
-            :bordered="true"
-            class="table"
-        >
-        </a-table>
-      </a-spin>
+            {{ text }}
+        </router-link>
+    </a-table>
+    </a-spin>
   </div>
 </template>
 
@@ -42,15 +41,14 @@ export default {
   data() {
     return {
         spinning: false,
-        form: this.$form.createForm(this),
+        keyword: '',
+        rule: '中 -> 英',
+        completeResult: [],
         columns: [{
             title: '中文(简体)',
             dataIndex: 'SimplifiedName',
             key: 'SimplifiedName',
-        }, {
-            title: '中文(繁体)',
-            dataIndex: 'TraditionalName',
-            key: 'TraditionalName',
+            scopedSlots: { customRender: 'SimplifiedName' }
         }, {
             title: '拼音',
             dataIndex: 'PinyinName',
@@ -59,26 +57,6 @@ export default {
             title: '英文_1',
             dataIndex: 'EnglishName_1',
             key: 'EnglishName_1',
-        }, {
-            title: '英文_2',
-            dataIndex: 'EnglishName_2',
-            key: 'EnglishName_2',
-        }, {
-            title: '英文_3',
-            dataIndex: 'EnglishName_3',
-            key: 'EnglishName_3',
-        }, {
-            title: '英文释义',
-            dataIndex: 'EnglishInterpretation',
-            key: 'EnglishInterpretation',
-        }, , {
-            title: '所属分类',
-            dataIndex: 'sortName',
-            key: 'sortName',
-        }, , {
-            title: '分类代码',
-            dataIndex: 'sortCode',
-            key: 'sortCode',
         }]
     }
   },
@@ -92,42 +70,73 @@ export default {
   },
 
   methods: {
-      search(e) {
-          e.preventDefault()
-          this.form.validateFields((err, values) => {
-              if (!err) {
-                  this.spinning = true
-                  this.$axios.post('search', qs.stringify({
-                      keyword: values.keyword
-                  }))
-                .then((res) => {
-                    this.spinning = false
-                    this.result = res.data.info
-                })
-            }
-        })
-      }
+      search() {
+          this.spinning = true
+          if (!!this.keyword) {
+              this.$axios.post('search', qs.stringify({
+                  keyword: this.keyword,
+                  rule: this.rule
+              }))
+              .then((res) => {
+                  this.spinning = false
+                  this.result = res.data.info
+              })
+          }
+          else {
+              this.$message.error('输入些关键字吧～')
+          }
+      },
+      autoComplete(value) {
+      this.$axios.post('autoComplete', qs.stringify({
+        keyword: value,
+        rule: this.rule
+      }))
+      .then((res) => {
+        this.completeResult = res.data.info
+      })
+    }
   }
 }
 </script>
 
 <style scoped>
-.summary {
-    color: red;
-    font-weight: bold;
+a {
+    text-decoration: none;
+}
+
+.result {
+    margin-top: 100px;
+}
+
+.auto-complete {
+  width: 600px;
+  margin-left: 10px
+}
+
+.rule {
+  width: 100px
 }
 
 .table {
-    background-color: white;
+    margin-top: 20px;
 }
 .table >>> .ant-pagination {
     margin: 16px auto;
     float: none;
 }
 
-@media screen and (min-width: 1200px) {
-    .container {
-        width: 1600px;
+@media screen and (max-width: 768px) {
+    .auto-complete {
+        width: 100px;
+    }
+}
+@media screen and (max-width: 970px) {
+    .auto-complete {
+        width: 250px;
+    }
+
+    .rule {
+        margin-bottom: 10px;
     }
 }
 </style>
