@@ -1,25 +1,42 @@
 <template>
   <div>
     <!-- drawer_report -->
-    <div>
+    <a-spin :spinning="spinning">
       <a-drawer
         title="报告错误"
-        :width="480"
+        :width="360"
         @close="visible = false"
         :visible="visible"
-        :wrapStyle="{height: 'calc(100% - 108px)',overflow: 'auto',paddingBottom: '108px'}"
+        :wrapStyle="{ height: 'calc(100% - 108px)', overflow: 'auto', paddingBottom: '108px' }"
       >
         <a-form :form="form" layout="vertical" hideRequiredMark>
           <a-form-item label="错误条目">
-
+            <a-select
+              v-decorator="[
+                'item',
+                {
+                  initialValue: '中文(简体)'
+                }
+              ]"
+            >
+              <a-select-option value="中文(简体)">中文(简体)</a-select-option>
+              <a-select-option value="中文(繁体)">中文(繁体)</a-select-option>
+              <a-select-option value="拼音">拼音</a-select-option>
+              <a-select-option value="英文_1">英文_1</a-select-option>
+              <a-select-option value="英文_2">英文_2</a-select-option>
+              <a-select-option value="英文_3">英文_3</a-select-option>
+              <a-select-option value="英文释义">英文释义</a-select-option>
+              <a-select-option value="分类名称">分类名称</a-select-option>
+              <a-select-option value="分类代码">分类代码</a-select-option>
+            </a-select>
           </a-form-item>
           <a-form-item label="修改意见">
-            <a-input
-              v-decorator="['url', {
+            <a-textarea
+              v-decorator="['feedback', {
                 rules: [{ required: true, message: '请输入修改意见' }]
               }]"
-              style="width: 100%"
               placeholder="修改意见"
+              :rows="8"
             />
           </a-form-item>
         </a-form>
@@ -41,10 +58,10 @@
           >
             取消
           </a-button>
-          <a-button @click="visible = false" type="primary">提交</a-button>
+          <a-button @click="report" type="primary">提交</a-button>
         </div>
       </a-drawer>
-    </div>
+    </a-spin>
     <!-- end - drawer_report -->
     <div class="container entry text-center">
       <img src="~assets/image/bg.png" class="logo" />
@@ -116,7 +133,8 @@ export default {
   data() {
     return {
       form: this.$form.createForm(this),
-      visible: false
+      visible: false,
+      spinning: false
     }
   },
 
@@ -141,6 +159,25 @@ export default {
   },
 
   methods: {
+    report(e) {
+      e.preventDefault()
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          this.$axios.post('reportEntry', qs.stringify({
+            item: values.item,
+            feedback: values.feedback
+          }))
+          .then((res) => {
+            if (res.data == 0) {
+              this.$message.success('提交成功，等待审核')
+            }
+            else {
+              this.$message.error('未知错误')
+            }
+          })
+        }
+      })
+    }
   }
 }
 </script>

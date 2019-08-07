@@ -41,6 +41,31 @@ def search(request):
 
 
 @csrf_exempt
+def submitEntry(request):
+    simplifiedName = request.POST.get('simplifiedName')
+    traditionalName = request.POST.get('traditionalName')
+    pinyin = request.POST.get('pinyin')
+    englishName_1 = request.POST.get('englishName_1')
+    englishName_2 = request.POST.get('englishName_2')
+    englishName_3 = request.POST.get('englishName_3')
+    englishInterpretation = request.POST.get('englishInterpretation')
+    sortName = request.POST.get('sortName')
+    sortCode = request.POST.get('sortCode')
+
+    pass
+
+
+
+@csrf_exempt
+def reportEntry(request):
+    item = request.POST.get('item')
+    feedback = request.POST.get('feedback')
+
+    pass
+
+
+
+@csrf_exempt
 def detail(request):
     SimplifiedName = request.POST.get('SimplifiedName')
     try:
