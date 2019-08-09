@@ -99,7 +99,7 @@
         <!-- end - drawer -->
         <a-spin :spinning="spinning">
             <div class="table-operations">
-                <a-button>刷新</a-button>
+                <a-button @click="refresh">刷新</a-button>
             </div>
             <a-table :columns="columns" :dataSource="reviews">
                 <span slot="action" slot-scope="record">
@@ -164,6 +164,14 @@ export default {
     }
   },
   methods: {
+      refresh() {
+          this.spinning = true
+          this.$axios.get('getAllReviews')
+          .then((res) => {
+              this.spinning = false
+              this.reviews = res.data.info
+          })
+      },
       viewEntry(id) {
           this.visible = true
           this.spinning_entry = true

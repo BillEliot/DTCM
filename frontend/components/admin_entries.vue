@@ -97,6 +97,14 @@
             </a-drawer>
         </a-spin>
         <a-spin :spinning="spinning">
+            <div class="table-operations">
+                <a-button @click="refresh">刷新</a-button>
+                <a-input-search
+                    placeholder="搜索术语(简体中文)"
+                    style="width: 200px"
+                    @search="searchEntry"
+                />
+            </div>
             <a-table :columns="columns" :dataSource="entries">
                 <span slot="action" slot-scope="record">
                     <a-button @click="edit(record.key)">编辑</a-button>
@@ -162,6 +170,14 @@ export default {
     }
   },
   methods: {
+      refresh() {
+          this.spinning = true
+          this.$axios.get('getAllEntries')
+          .then((res) => {
+              this.spinning = false
+              this.entries = res.data.info
+          })
+      },
       edit(id) {
         this.visible = true
         this.spinning_entry = true
@@ -220,6 +236,26 @@ export default {
             }
         })
       },
+      searchEntry(value) {
+          if (value == '') {
+              this.spinning = true
+              this.$axios.get('getAllEntries')
+              .then((res) => {
+                  this.spinning = false
+                  this.entries = res.data.info
+              })
+          }
+          else {
+              this.spinning = true
+              this.$axios.post('searchEntry', qs.stringify({
+                  simplifiedName: value
+              }))
+              .then((res) => {
+                  this.spinning = false
+                  this.entries = res.data.info
+              })
+          }
+      },
       deleteEntry(id) {
           this.$axios.post('deleteEntry', qs.stringify({
               id: id
@@ -251,5 +287,9 @@ export default {
 <style scoped>
 a {
     text-decoration: none;
+}
+
+.table-operations {
+    margin: 15px;
 }
 </style>

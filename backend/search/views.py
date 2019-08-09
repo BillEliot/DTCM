@@ -54,6 +54,24 @@ def search(request):
 
 
 @csrf_exempt
+def searchEntry(request):
+    simplifiedName = request.POST.get('simplifiedName')
+
+    entryList = []
+    for entry in Entry.objects.filter(SimplifiedName__contains=simplifiedName):
+        entryList.append({
+            'key': entry.id,
+            'simplifiedName': entry.SimplifiedName,
+            'pinyin': entry.PinyinName,
+            'sortName': entry.sort.name,
+            'sortCode': entry.sort.code
+        })
+    
+    return JsonResponse({ 'info': entryList })
+
+
+
+@csrf_exempt
 def reportEntry(request):
     _id = request.POST.get('id')
     item = request.POST.get('item')
