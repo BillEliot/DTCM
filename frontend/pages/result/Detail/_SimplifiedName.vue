@@ -72,17 +72,17 @@
       <div class="row">
         <div class="col-md-4">
           <a-card title="中文(简体)">
-            <p>{{ entry.SimplifiedName }}</p>
+            <p>{{ entry.simplifiedName }}</p>
           </a-card>
         </div>
         <div class="col-md-4">
           <a-card title="中文(繁体)">
-            <p>{{ entry.TraditionalName }}</p>
+            <p>{{ entry.traditionalName }}</p>
           </a-card> 
         </div>
         <div class="col-md-4">
           <a-card title="拼音">
-            <p>{{ entry.PinyinName }}</p>
+            <p>{{ entry.pinyinName }}</p>
           </a-card>
         </div>
       </div>
@@ -90,17 +90,17 @@
       <div class="row">
         <div class="col-md-4">
           <a-card title="英文_1">
-            <p>{{ entry.English_1 }}</p>
+            <p>{{ entry.english_1 }}</p>
           </a-card>
         </div>
         <div class="col-md-4">
           <a-card title="英文_2">
-            <p>{{ entry.English_2 }}</p>
+            <p>{{ entry.english_2 }}</p>
           </a-card>
         </div>
         <div class="col-md-4">
           <a-card title="英文_3">
-            <p>{{ entry.English_3 }}</p>
+            <p>{{ entry.english_3 }}</p>
           </a-card>
         </div>
       </div>
@@ -108,7 +108,7 @@
       <div class="row">
         <div class="col-md-4">
           <a-card title="英文释义">
-            <p>{{ entry.EnglishInterpretation }}</p>
+            <p>{{ entry.englishInterpretation }}</p>
           </a-card>
         </div>
         <div class="col-md-4">
@@ -163,12 +163,17 @@ export default {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
+          this.spinning = true
           this.$axios.post('reportEntry', qs.stringify({
+            id: this.entry.id,
             item: values.item,
             feedback: values.feedback
           }))
           .then((res) => {
             if (res.data == 0) {
+              this.spinning = false
+              this.visible = false
+              this.form.resetFields()
               this.$message.success('提交成功，等待审核')
             }
             else {

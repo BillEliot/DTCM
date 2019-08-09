@@ -19,6 +19,7 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.5.4",
     "ant-design-vue": "^1.1.10",
+    "js-md5": "^0.7.3",
     "nuxt": "^2.0.0"
   },
   "devDependencies": {
