@@ -1,6 +1,8 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.hashers import check_password
 from .models import *
+from utils.utils import *
 
 
 @csrf_exempt
@@ -20,6 +22,19 @@ def login(request):
 def search(request):
     keyword = request.POST.get('keyword')
     rule = request.POST.get('rule')
+    captcha = request.POST.get('captcha')
+    encryCaptcha = request.POST.get('encryCaptcha')
+
+    # Multiple consecutive searches are not allowed
+    request.session['searchNum'] = request.session.get('searchNum', default=0) + 1
+    request.session.set_expiry(0)
+    if request.session.get('searchNum', default=0) > 2 and captcha == '':
+        encryCaptcha = genCaptcha()
+        return JsonResponse({ 'encryCaptcha': encryCaptcha })
+    elif request.session.get('searchNum', default=0) > 2 and captcha != '':
+        # check captcha
+        if not check_password(captcha, encryCaptcha):
+            return HttpResponse(1)
 
     entryList = []
     if rule == '中 -> 英':
@@ -123,9 +138,9 @@ def getAllReviews(request):
 
 @csrf_exempt
 def detail(request):
-    SimplifiedName = request.POST.get('SimplifiedName')
+    _id = request.POST.get('id')
     try:
-        entry = Entry.objects.get(SimplifiedName=SimplifiedName)
+        entry = Entry.objects.get(id=_id)
         return JsonResponse({
             'id': entry.id,
             'simplifiedName': entry.SimplifiedName,

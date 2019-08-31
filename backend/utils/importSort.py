@@ -10,9 +10,9 @@ def importSortFromCSV(path):
     csv_file = csv.reader(open(path, 'r'))
     sortList = []
     for row in csv_file:
-        sortList.append((row[0], row[1], row[2], row[3]))
+        sortList.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
     
-    connection.executemany("INSERT INTO search_entry (PinyinName, SimplifiedName, EnglishName_1, Sort_id) VALUES (?,?,?,?)", sortList)
+    connection.executemany("INSERT INTO search_entry (SimplifiedName, TraditionalName, PinyinName, EnglishName_1, EnglishName_2, EnglishName_3, EnglishInterpretation, Sort_id) VALUES (?,?,?,?,?,?,?,?)", sortList)
     connection.commit()
     connection.close()
     print('[+] 共添加%d条数据' % len(sortList))

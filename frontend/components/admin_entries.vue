@@ -31,24 +31,24 @@
                             placeholder="拼音"
                         />
                     </a-form-item>
-                    <a-form-item label="英文_1">
+                    <a-form-item label="WHO">
                         <a-input
                             v-decorator="['englishName_1', {
-                                rules: [{ required: true, message: '请输入英文_1' }],
+                                rules: [{ required: true, message: '请输入WHO' }],
                             }]"
-                            placeholder="英文_1"
+                            placeholder="WHO"
                         />
                     </a-form-item>
-                    <a-form-item label="英文_2">
+                    <a-form-item label="PMPH">
                         <a-input
                             v-decorator="['englishName_2']"
-                            placeholder="英文_2"
+                            placeholder="PMPH"
                         />
                     </a-form-item>
-                    <a-form-item label="英文_3">
+                    <a-form-item label="OTHER">
                         <a-input
                             v-decorator="['englishName_3']"
-                            placeholder="英文_4"
+                            placeholder="OTHER"
                         />
                     </a-form-item>
                     <a-form-item label="英文释义">

@@ -52,7 +52,7 @@ export default {
       pathRewrite: {
         '^/api': '/api',
         changeOrigin: true
-      } 
+      }
     }
   },
   /*

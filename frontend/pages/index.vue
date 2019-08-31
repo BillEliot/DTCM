@@ -1,23 +1,38 @@
 <template>
-  <div  class="container text-center warpper">
-    <img src="~assets/image/bg.png" class="logo" />
-    <h1>中医术语中英对照查询系统</h1>
-    <p class="sub-title">A System for Chinese-English Terminology of Chinese Medicine</p>
-    <a-spin :spinning="spinning">
-      <a-select v-model="rule" class="rule">
-        <a-select-option value="中 -> 英">中 -> 英</a-select-option>
-        <a-select-option value="英 -> 中">英 -> 中</a-select-option>
-      </a-select>
-      <a-auto-complete
-        v-model="keyword"
-        :dataSource="completeResult"
-        @search="autoComplete"
-        placeholder="输入关键字"
-        :allowClear="true"
-        class="auto-complete"
-      />
-      <a-button type="primary" @click="search" style="margin-left: 10px">搜索</a-button>
-    </a-spin>
+  <div>
+    <!-- Captcha -->
+    <a-modal
+        title="输入验证码(区分大小写)"
+        :visible="visible"
+        @ok="confirmCaptcha"
+        @cancel="visible = false"
+        :confirmLoading="confirmLoading"
+    >
+        <img :src="'http://39.106.227.250:8000/media/captchas/' + encryCaptcha.replace('/', '+') + '.jpg'">
+        <a-input placeholder="请输入验证码" v-model="captcha">
+            <a-icon slot="prefix" type="code" />
+        </a-input>
+    </a-modal>
+    <div class="container text-center warpper">
+      <img src="~assets/image/bg.png" class="logo" />
+      <h1>中医术语中英对照查询系统</h1>
+      <p class="sub-title">The System for Chinese-English Terminology of Chinese Medicine</p>
+      <a-spin :spinning="spinning">
+        <a-select v-model="rule" class="rule">
+          <a-select-option value="中 -> 英">中(CN) -> 英(EN)</a-select-option>
+          <a-select-option value="英 -> 中">英(EN) -> 中(CN)</a-select-option>
+        </a-select>
+        <a-auto-complete
+          v-model="keyword"
+          :dataSource="completeResult"
+          @search="autoComplete"
+          placeholder="输入关键字"
+          :allowClear="true"
+          class="auto-complete"
+        />
+        <a-button type="primary" @click="search" class="search">搜索</a-button>
+      </a-spin>
+    </div>
   </div>
 </template>
 
@@ -31,7 +46,11 @@ export default {
       spinning: false,
       keyword: '',
       rule: '中 -> 英',
-      completeResult: []
+      completeResult: [],
+      captcha: '',
+      encryCaptcha: '',
+      visible: false,
+      confirmLoading: false
     }
   },
 
@@ -45,16 +64,37 @@ export default {
       if (!!this.keyword) {
         this.$axios.post('search', qs.stringify({
           keyword: this.keyword,
-          rule: this.rule
+          rule: this.rule,
+          captcha: this.captcha,
+          encryCaptcha: this.encryCaptcha
         }))
         .then((res) => {
           this.spinning = false
-          this.setSearchResult(res.data.info)
-          this.$router.push({ path: '/result' })
+          this.confirmLoading = false
+          if (res.data.encryCaptcha) {
+            // Need to enter Captcha
+            this.encryCaptcha = res.data.encryCaptcha
+            this.visible = true
+          }
+          else if (res.data == 1) {
+            this.$message.error('验证码错误')
+          }
+          else {
+            this.setSearchResult(res.data.info)
+            this.$router.push({ path: '/result' })
+          }
         })
       }
       else {
         this.$message.error('输入些关键字吧～')
+      }
+    },
+    confirmCaptcha() {
+      if (!!this.captcha) {
+          this.search()
+      }
+      else {
+          this.$message.error('验证码不能为空')
       }
     },
     autoComplete(value) {
@@ -96,7 +136,12 @@ export default {
 }
 
 .rule {
-  width: 100px
+  width: 160px
+}
+
+.search {
+  margin-left: 10px;
+  height: 40px;
 }
 
 @media screen and (max-width: 768px) {
