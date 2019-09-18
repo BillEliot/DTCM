@@ -8,7 +8,7 @@
             @cancel="visible = false"
             :confirmLoading="confirmLoading"
         >
-            <img :src="'http://localhost:8000/media/captchas/' + encryCaptcha.replace('/', '+') + '.jpg'">
+            <img :src="'/media/captchas/' + encryCaptcha.replace('/', '+') + '.jpg'">
             <a-input placeholder="请输入验证码" v-model="captcha">
                 <a-icon slot="prefix" type="code" />
             </a-input>
@@ -43,6 +43,14 @@
                     >
                         {{ text }}
                     </router-link>
+                    <router-link
+                        slot="TraditionalName"
+                        slot-scope="text, record"
+                        target="_blank"
+                        :to="{ path: '/result/Detail', query: { id: record.id } }"
+                    >
+                        {{ text }}
+                    </router-link>
                 </a-table>
             </a-spin>
         </div>
@@ -60,14 +68,15 @@ export default {
         rule: '中 -> 英',
         completeResult: [],
         columns: [{
-            title: 'id',
-            dataIndex: 'id',
-            key: 'id'
-        },{
             title: '中文(简体)',
             dataIndex: 'SimplifiedName',
             key: 'SimplifiedName',
             scopedSlots: { customRender: 'SimplifiedName' }
+        },{
+            title: '中文(繁體)',
+            dataIndex: 'TraditionalName',
+            key: 'TraditionalName',
+            scopedSlots: { customRender: 'TraditionalName' }
         }, {
             title: '拼音',
             dataIndex: 'PinyinName',

@@ -45,10 +45,10 @@
                             placeholder="PMPH"
                         />
                     </a-form-item>
-                    <a-form-item label="OTHER">
+                    <a-form-item label="WFCMS">
                         <a-input
                             v-decorator="['englishName_3']"
-                            placeholder="OTHER"
+                            placeholder="WFCMS"
                         />
                     </a-form-item>
                     <a-form-item label="英文释义">

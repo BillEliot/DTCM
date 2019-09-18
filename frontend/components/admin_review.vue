@@ -45,10 +45,10 @@
                             placeholder="PMPH"
                         />
                     </a-form-item>
-                    <a-form-item label="OTHER">
+                    <a-form-item label="WFCMS">
                         <a-input
                             v-decorator="['englishName_3']"
-                            placeholder="OTHER"
+                            placeholder="WFCMS"
                         />
                     </a-form-item>
                     <a-form-item label="英文释义">
@@ -103,9 +103,9 @@
             </div>
             <a-table :columns="columns" :dataSource="reviews">
                 <span slot="action" slot-scope="record">
-                    <a-button type="primary" @click="viewEntry(record.key)">查看/修改术语</a-button>
+                    <a-button type="primary" @click="viewEntry(record.id)">查看/修改术语</a-button>
                     <a-divider type="vertical" />
-                    <a-button type="danger" @click="deny(record.reviewID)">忽略</a-button>
+                    <a-button type="danger" @click="deny(record.key)">忽略</a-button>
                 </span>
             </a-table>
         </a-spin>
@@ -126,15 +126,15 @@ export default {
         reviews: [],
         columns: [{
             title: '审核ID',
-            dataIndex: 'reviewID',
-            key: 'reviewID',
-            sorter: (a, b) => a.reviewID - b.reviewID
-        },
-        {
-            title: '术语ID',
             dataIndex: 'key',
             key: 'key',
             sorter: (a, b) => a.key - b.key
+        },
+        {
+            title: '术语ID',
+            dataIndex: 'id',
+            key: 'id',
+            sorter: (a, b) => a.id - b.id
         },
         {
             title: '修改项目',
@@ -202,10 +202,10 @@ export default {
               }
           })
       },
-      deny(reviewID) {
+      deny(key) {
           this.spinning = true
           this.$axios.post('denyReview', qs.stringify({
-              reviewID: reviewID
+              key: key
           }))
           .then((res) => {
               if (res.data == 0) {
@@ -213,7 +213,7 @@ export default {
                   this.$message.success('已忽略')
 
                   let reviews = [...this.reviews]
-                  this.reviews = reviews.filter(item => item.reviewID !== reviewID)
+                  this.reviews = reviews.filter(item => item.key !== key)
               }
               else {
                   this.$message.error('未知错误')

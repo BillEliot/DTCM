@@ -7,7 +7,8 @@
         :width="360"
         @close="visible = false"
         :visible="visible"
-        :wrapStyle="{ height: 'calc(100% - 108px)', overflow: 'auto', paddingBottom: '108px' }"
+        :wrapStyle="{ height: 'calc(100% - 10px)', overflow: 'auto', paddingBottom: '108px' }"
+        style="z-index: 999"
       >
         <a-form :form="form" layout="vertical" hideRequiredMark>
           <a-form-item label="错误条目">
@@ -24,7 +25,7 @@
               <a-select-option value="拼音">拼音</a-select-option>
               <a-select-option value="英文_1">WHO</a-select-option>
               <a-select-option value="英文_2">PMPH</a-select-option>
-              <a-select-option value="英文_3">OTHER</a-select-option>
+              <a-select-option value="英文_3">WFCMS</a-select-option>
               <a-select-option value="英文释义">英文释义</a-select-option>
               <a-select-option value="分类名称">分类名称</a-select-option>
               <a-select-option value="分类代码">分类代码</a-select-option>
@@ -51,6 +52,7 @@
             background: '#fff',
             textAlign: 'right',
           }"
+          style="z-index: 999"
         >
           <a-button
             :style="{ marginRight: '8px' }"
@@ -62,6 +64,19 @@
         </div>
       </a-drawer>
     </a-spin>
+    <!-- Captcha -->
+    <a-modal
+      title="输入验证码(区分大小写)"
+      :visible="visible_captcha"
+      @ok="confirmCaptcha"
+      @cancel="visible_captcha = false"
+      :confirmLoading="confirmLoading"
+    >
+      <img :src="'/media/captchas/' + encryCaptcha.replace('/', '+') + '.jpg'">
+      <a-input placeholder="请输入验证码" v-model="captcha">
+          <a-icon slot="prefix" type="code" />
+      </a-input>
+    </a-modal>
     <!-- end - drawer_report -->
     <div class="container entry text-center">
       <img src="~assets/image/bg.png" class="logo" />
@@ -99,7 +114,7 @@
           </a-card>
         </div>
         <div class="col-md-4">
-          <a-card title="OTHER">
+          <a-card title="WFCMS">
             <p>{{ entry.englishName_3 }}</p>
           </a-card>
         </div>
@@ -134,7 +149,11 @@ export default {
     return {
       form: this.$form.createForm(this),
       visible: false,
-      spinning: false
+      spinning: false,
+      confirmLoading: false,
+      captcha: '',
+      encryCaptcha: '',
+      visible_captcha: false
     }
   },
 
@@ -160,28 +179,52 @@ export default {
 
   methods: {
     report(e) {
-      e.preventDefault()
+      if (!!e) e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
           this.spinning = true
+          this.confirmLoading = true
           this.$axios.post('reportEntry', qs.stringify({
             id: this.entry.id,
             item: values.item,
-            feedback: values.feedback
+            feedback: values.feedback,
+            captcha: this.captcha,
+            encryCaptcha: this.encryCaptcha
           }))
           .then((res) => {
-            if (res.data == 0) {
-              this.spinning = false
-              this.visible = false
-              this.form.resetFields()
-              this.$message.success('提交成功，等待审核')
+            this.spinning = false
+            this.confirmLoading = false
+            if (res.data.encryCaptcha) {
+              // Need to enter Captcha
+              this.encryCaptcha = res.data.encryCaptcha
+              this.visible_captcha = true
+            }
+            else if (res.data == 1) {
+              this.$message.error('验证码错误')
+            }
+            else if (res.data == 2) {
+              this.$message.error('未知错误')
             }
             else {
-              this.$message.error('未知错误')
+              this.spinning = false
+              this.visible = false
+              this.visible_captcha = false
+              this.captcha = ''
+              this.encryCaptcha = ''
+              this.form.resetFields()
+              this.$message.success('感谢您的提交，等待审核')
             }
           })
         }
       })
+    },
+    confirmCaptcha() {
+      if (!!this.captcha) {
+        this.report()
+      }
+      else {
+        this.$message.error('验证码不能为空')
+      }
     }
   }
 }
@@ -199,8 +242,8 @@ p {
 }
 
 .logo {
-  width: 300px;
-  height: 300px;
+  width: 200px;
+  height: 200px;
   margin-bottom: 30px;
 }
 

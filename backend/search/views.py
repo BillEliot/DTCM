@@ -60,6 +60,7 @@ def search(request):
         entryList.append({
             'id': entry.id,
             'SimplifiedName': entry.SimplifiedName,
+            'TraditionalName': entry.TraditionalName,
             'PinyinName': entry.PinyinName,
             'EnglishName_1': entry.EnglishName_1
         })
@@ -91,6 +92,19 @@ def reportEntry(request):
     _id = request.POST.get('id')
     item = request.POST.get('item')
     feedback = request.POST.get('feedback')
+    captcha = request.POST.get('captcha')
+    encryCaptcha = request.POST.get('encryCaptcha')
+
+    # Multiple consecutive reports are not allowed
+    request.session['reportNum'] = request.session.get('reportNum', default=0) + 1
+    request.session.set_expiry(0)
+    if request.session.get('reportNum', default=0) > 2 and captcha == '':
+        encryCaptcha = genCaptcha()
+        return JsonResponse({ 'encryCaptcha': encryCaptcha })
+    elif request.session.get('reportNum', default=0) > 2 and captcha != '':
+        # check captcha
+        if not check_password(captcha, encryCaptcha):
+            return HttpResponse(1)
 
     try:
         Review.objects.create(
@@ -100,7 +114,7 @@ def reportEntry(request):
         )
         return HttpResponse(0)
     except:
-        return HttpResponse(1)
+        return HttpResponse(2)
 
 
 
@@ -108,13 +122,16 @@ def reportEntry(request):
 def getAllEntries(request):
     entryList = []
     for entry in Entry.objects.all():
-        entryList.append({
-            'key': entry.id,
-            'simplifiedName': entry.SimplifiedName,
-            'pinyin': entry.PinyinName,
-            'sortName': entry.sort.name,
-            'sortCode': entry.sort.code
-        })
+        try:
+            entryList.append({
+                'key': entry.id,
+                'simplifiedName': entry.SimplifiedName,
+                'pinyin': entry.PinyinName,
+                'sortName': entry.sort.name,
+                'sortCode': entry.sort.code
+            })
+        except:
+            print("Error")
     
     return JsonResponse({ 'info': entryList })
 
@@ -125,8 +142,8 @@ def getAllReviews(request):
     reviewList = []
     for review in Review.objects.all():
         reviewList.append({
-            'reviewID': review.id,
-            'key': review.entry.id,
+            'key': review.id,
+            'id': review.entry.id,
             'item': review.item,
             'feedback': review.feedback,
             'date': review.date
@@ -225,9 +242,9 @@ def updateEntry(request):
 
 @csrf_exempt
 def denyReview(request):
-    reviewID = request.POST.get('reviewID')
+    key = request.POST.get('key')
     try:
-        review = Review.objects.get(id=reviewID)
+        review = Review.objects.get(id=key)
         review.delete()
         return HttpResponse(0)
     except:
@@ -240,34 +257,41 @@ def autoComplete(request):
     keyword = request.POST.get('keyword')
     rule = request.POST.get('rule')
 
-    entryList = []
-    if rule == "中 -> 英":
-        # field - SimplifiedName
-        result_1 = Entry.objects.filter(SimplifiedName__contains=keyword)
-        # field - TraditionalName
-        result_2 = Entry.objects.filter(TraditionalName__contains=keyword)
-        # field - PinyinName
-        result_3 = Entry.objects.filter(PinyinName__contains=keyword)
+    if keyword:
+        entryList = []
+        if rule == "中 -> 英":
+            # field - SimplifiedName
+            result_1 = Entry.objects.filter(SimplifiedName__contains=keyword)
+            # field - TraditionalName
+            result_2 = Entry.objects.filter(TraditionalName__contains=keyword)
+            # field - PinyinName
+            result_3 = Entry.objects.filter(PinyinName__contains=keyword)
 
-        # union and distinct
-        result = result_1 | result_2 | result_3
-        result = result.order_by('id').distinct()[:10]
-        # get its sort info
-        for entry in result:
-            entryList.append(entry.SimplifiedName)
-    elif rule == "英 -> 中":
-        # field - EnglishName_1
-        result_1 = Entry.objects.filter(EnglishName_1__contains=keyword)
-        # field - EnglishName_2
-        result_2 = Entry.objects.filter(EnglishName_2__contains=keyword)
-        # field - EnglishName_3
-        result_3 = Entry.objects.filter(EnglishName_3__contains=keyword)
+            # union and distinct
+            result = result_1 | result_2 | result_3
+            result = result.order_by('id').distinct()[:10]
+            # get its sort info
+            for entry in result:
+                entryList.append(entry.SimplifiedName)
+            return JsonResponse({ 'info': entryList })
+        elif rule == "英 -> 中":
+            # field - EnglishName_1
+            result_1 = Entry.objects.filter(EnglishName_1__contains=keyword)
+            if result_1.count() != 0:
+                for entry in result_1.order_by('id').distinct()[:10]:
+                    entryList.append(entry.EnglishName_1)
+                return JsonResponse({ 'info': entryList })
+            # field - EnglishName_2
+            result_2 = Entry.objects.filter(EnglishName_2__contains=keyword)
+            if result_2.count() != 0:
+                for entry in result_2.order_by('id').distinct()[:10]:
+                    entryList.append(entry.EnglishName_2)
+                return JsonResponse({ 'info': entryList })
+            # field - EnglishName_3
+            result_3 = Entry.objects.filter(EnglishName_3__contains=keyword)
+            if result_3.count() != 0:
+                for entry in result_3.order_by('id').distinct()[:10]:
+                    entryList.append(entry.EnglishName_3)
+                return JsonResponse({ 'info': entryList })
 
-        # union and distinct
-        result = result_1 | result_2 | result_3
-        result = result.order_by('id').distinct()[:10]
-        # get its sort info
-        for entry in result:
-            entryList.append(entry.EnglishName_1)
-
-    return JsonResponse({ 'info': entryList })
+    return JsonResponse({ 'info': ['NULL'] })

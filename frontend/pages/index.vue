@@ -8,7 +8,7 @@
         @cancel="visible = false"
         :confirmLoading="confirmLoading"
     >
-        <img :src="'http://39.106.227.250:8000/media/captchas/' + encryCaptcha.replace('/', '+') + '.jpg'">
+        <img :src="'/media/captchas/' + encryCaptcha.replace('/', '+') + '.jpg'">
         <a-input placeholder="请输入验证码" v-model="captcha">
             <a-icon slot="prefix" type="code" />
         </a-input>
@@ -18,19 +18,20 @@
       <h1>中医术语中英对照查询系统</h1>
       <p class="sub-title">The System for Chinese-English Terminology of Chinese Medicine</p>
       <a-spin :spinning="spinning">
-        <a-select v-model="rule" class="rule">
+        <a-select v-model="rule" size="large" class="rule">
           <a-select-option value="中 -> 英">中(CN) -> 英(EN)</a-select-option>
           <a-select-option value="英 -> 中">英(EN) -> 中(CN)</a-select-option>
         </a-select>
         <a-auto-complete
           v-model="keyword"
           :dataSource="completeResult"
+          size="large"
           @search="autoComplete"
           placeholder="输入关键字"
           :allowClear="true"
           class="auto-complete"
         />
-        <a-button type="primary" @click="search" class="search">搜索</a-button>
+        <a-button type="primary" @click="search" size="large" class="search">搜索</a-button>
       </a-spin>
     </div>
   </div>
@@ -121,27 +122,27 @@ export default {
 }
 
 .logo {
-  width: 300px;
-  height: 300px;
+  width: 200px;
+  height: 200px;
 }
 
 .sub-title {
-  color: lightgray;
+  color: gray;
   font-size: 18px;
 }
 
 .auto-complete {
   width: 600px;
-  margin-left: 10px
+  height: 40px;
+  margin-left: 10px;
 }
 
 .rule {
-  width: 160px
+  width: 180px;
 }
 
 .search {
   margin-left: 10px;
-  height: 40px;
 }
 
 @media screen and (max-width: 768px) {
