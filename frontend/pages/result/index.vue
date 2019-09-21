@@ -33,6 +33,7 @@
                     :dataSource="result"
                     :rowKey="result => result.id"
                     :bordered="true"
+                    :pagination="false"
                     class="table"
                 >
                     <router-link
@@ -70,21 +71,17 @@ export default {
         columns: [{
             title: '中文(简体)',
             dataIndex: 'SimplifiedName',
-            key: 'SimplifiedName',
             scopedSlots: { customRender: 'SimplifiedName' }
         },{
             title: '中文(繁體)',
             dataIndex: 'TraditionalName',
-            key: 'TraditionalName',
             scopedSlots: { customRender: 'TraditionalName' }
         }, {
             title: '拼音',
             dataIndex: 'PinyinName',
-            key: 'PinyinName',
         }, {
             title: 'WHO',
             dataIndex: 'EnglishName_1',
-            key: 'EnglishName_1',
         }],
         captcha: '',
         encryCaptcha: '',

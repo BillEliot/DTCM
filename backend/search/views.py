@@ -54,9 +54,8 @@ def search(request):
     
     # union and distinct
     result = result_1 | result_2 | result_3
-    result.distinct()
     # get its sort info
-    for entry in result:
+    for entry in result.distinct().order_by('PinyinName')[:10]:
         entryList.append({
             'id': entry.id,
             'SimplifiedName': entry.SimplifiedName,
@@ -74,15 +73,17 @@ def searchEntry(request):
     simplifiedName = request.POST.get('simplifiedName')
 
     entryList = []
-    for entry in Entry.objects.filter(SimplifiedName__contains=simplifiedName):
-        entryList.append({
-            'key': entry.id,
-            'simplifiedName': entry.SimplifiedName,
-            'pinyin': entry.PinyinName,
-            'sortName': entry.sort.name,
-            'sortCode': entry.sort.code
-        })
-    
+    try:
+        for entry in Entry.objects.filter(SimplifiedName__contains=simplifiedName):
+            entryList.append({
+                'key': entry.id,
+                'simplifiedName': entry.SimplifiedName,
+                'pinyin': entry.PinyinName,
+                'sortName': entry.sort.name,
+                'sortCode': entry.sort.code
+            })
+    except:
+        print('Error')
     return JsonResponse({ 'info': entryList })
 
 
@@ -120,8 +121,10 @@ def reportEntry(request):
 
 @csrf_exempt
 def getAllEntries(request):
+    index = int(request.POST.get('index'))
+
     entryList = []
-    for entry in Entry.objects.all():
+    for entry in Entry.objects.all()[index*10+1:index*10+11]:
         try:
             entryList.append({
                 'key': entry.id,
@@ -133,7 +136,7 @@ def getAllEntries(request):
         except:
             print("Error")
     
-    return JsonResponse({ 'info': entryList })
+    return JsonResponse({ 'list': entryList, 'total': Entry.objects.all().count() / 10 })
 
 
 

@@ -105,7 +105,7 @@
                     @search="searchEntry"
                 />
             </div>
-            <a-table :columns="columns" :dataSource="entries">
+            <a-table :columns="columns" :dataSource="entries" :pagination="pagination" @change="handleTableChange" >
                 <span slot="action" slot-scope="record">
                     <a-button @click="edit(record.key)">编辑</a-button>
                     <a-divider type="vertical" />
@@ -126,6 +126,9 @@ export default {
         spinning_entry: false,
         form: this.$form.createForm(this),
         entries: [],
+        pagination: {
+            total: 0
+        },
         entry: {},
         visible: false,
         columns: [{
@@ -170,13 +173,19 @@ export default {
     }
   },
   methods: {
-      refresh() {
+      refresh(page) {
           this.spinning = true
-          this.$axios.get('getAllEntries')
+          this.$axios.post('getAllEntries', qs.stringify({
+              index: page
+          }))
           .then((res) => {
               this.spinning = false
-              this.entries = res.data.info
+              this.entries = res.data.list
+              this.pagination.total = res.data.total
           })
+      },
+      handleTableChange(pagination, filters, sorter) {
+          this.refresh(pagination.current)
       },
       edit(id) {
         this.visible = true
@@ -274,12 +283,7 @@ export default {
       }
   },
   mounted() {
-      this.spinning = true
-      this.$axios.get('getAllEntries')
-      .then((res) => {
-          this.spinning = false
-          this.entries = res.data.info
-      })
+      this.refresh(0)
   }
 }
 </script>

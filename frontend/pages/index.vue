@@ -33,6 +33,9 @@
         />
         <a-button type="primary" @click="search" size="large" class="search">搜索</a-button>
       </a-spin>
+      <a target="_blank" href="http://note.youdao.com/noteshare?id=3821e88b2bdc8691d666c2553f32d6e7" class="copyright">
+        中医术语中英对照查询系统 Copyright (C) CETCMS, All Rights Reserved
+      </a>
     </div>
   </div>
 </template>
@@ -112,37 +115,41 @@ export default {
 </script>
 
 <style scoped>
+a {
+  text-decoration: none;
+}
 .submit {
   margin-top: 10px;
   margin-right: 10px;
 }
-
 .warpper {
   margin-top: 50px;
 }
-
 .logo {
   width: 200px;
   height: 200px;
 }
-
 .sub-title {
   color: gray;
   font-size: 18px;
 }
-
 .auto-complete {
   width: 600px;
   height: 40px;
   margin-left: 10px;
 }
-
 .rule {
   width: 180px;
 }
-
 .search {
   margin-left: 10px;
+}
+.copyright {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
 }
 
 @media screen and (max-width: 768px) {
