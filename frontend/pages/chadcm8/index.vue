@@ -67,7 +67,7 @@ export default {
                         }
                         else {
                             this.setIsLogin(true)
-                            this.$router.push({ path: '/admin/cms' })
+                            this.$router.push({ path: '/chadcm8/cms' })
                         }
                     })
                 }
