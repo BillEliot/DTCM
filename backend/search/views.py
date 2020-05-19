@@ -1,6 +1,7 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import check_password
+from django.db.models.functions import Length
 from .models import *
 from utils.utils import *
 
@@ -55,7 +56,7 @@ def search(request):
     # union and distinct
     result = result_1 | result_2 | result_3
     # get its sort info
-    for entry in result.distinct().order_by('PinyinName')[:10]:
+    for entry in result.distinct().order_by(Length('SimplifiedName').asc(), 'PinyinName')[:10]:
         entryList.append({
             'id': entry.id,
             'SimplifiedName': entry.SimplifiedName,

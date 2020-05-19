@@ -23,17 +23,18 @@
           <a-select-option value="英 -> 中">英(EN) -> 中(CN)</a-select-option>
         </a-select>
         <a-auto-complete
-          v-model="keyword"
+          v-model="searchKeyword"
           :dataSource="completeResult"
           size="large"
           @search="autoComplete"
+          @focus="onFocus"
+          @blur="onBlur"
           placeholder="输入关键字"
-          :allowClear="true"
           class="auto-complete"
         />
         <a-button type="primary" @click="search" size="large" class="search">搜索</a-button>
       </a-spin>
-      <a target="_blank" href="http://note.youdao.com/noteshare?id=3821e88b2bdc8691d666c2553f32d6e7" class="copyright">
+      <a v-show="!isFocus" target="_blank" href="http://note.youdao.com/noteshare?id=3821e88b2bdc8691d666c2553f32d6e7" class="copyright">
         中医术语中英对照查询系统 Copyright (C) CETCMS, All Rights Reserved
       </a>
     </div>
@@ -48,13 +49,14 @@ export default {
   data() {
     return {
       spinning: false,
-      keyword: '',
+      searchKeyword: '',
       rule: '中 -> 英',
       completeResult: [],
       captcha: '',
       encryCaptcha: '',
       visible: false,
-      confirmLoading: false
+      confirmLoading: false,
+      isFocus: false
     }
   },
 
@@ -64,10 +66,10 @@ export default {
     }),
 
     search() {
-      this.spinning = true
-      if (!!this.keyword) {
+      if (!!this.searchKeyword) {
+        this.spinning = true
         this.$axios.post('search', qs.stringify({
-          keyword: this.keyword,
+          keyword: this.searchKeyword,
           rule: this.rule,
           captcha: this.captcha,
           encryCaptcha: this.encryCaptcha
@@ -109,6 +111,16 @@ export default {
       .then((res) => {
         this.completeResult = res.data.info
       })
+    },
+    onFocus() {
+      if (this.isMobile()) this.isFocus = true
+    },
+    onBlur() {
+      this.isFocus = false
+    },
+    isMobile() {
+      let flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
+      return flag
     }
   }
 }

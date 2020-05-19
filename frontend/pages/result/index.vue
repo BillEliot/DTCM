@@ -100,9 +100,9 @@ export default {
 
   methods: {
       search() {
-        this.spinning = true
-        this.confirmLoading = true
         if (!!this.keyword) {
+            this.spinning = true
+            this.confirmLoading = true
             this.$axios.post('search', qs.stringify({
                 keyword: this.keyword,
                 rule: this.rule,
