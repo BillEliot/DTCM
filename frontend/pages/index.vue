@@ -34,9 +34,15 @@
         />
         <a-button type="primary" @click="search" size="large" class="search">搜索</a-button>
       </a-spin>
-      <a v-show="!isFocus" target="_blank" href="http://note.youdao.com/noteshare?id=3821e88b2bdc8691d666c2553f32d6e7" class="copyright">
-        中医术语中英对照查询系统 Copyright (C) CETCMS, All Rights Reserved
-      </a>
+      <div class="copyright">
+        <a v-show="!isFocus" target="_blank" href="http://note.youdao.com/noteshare?id=3821e88b2bdc8691d666c2553f32d6e7">
+          © 中医术语中英对照查询系统 Copyright (C) CETCMS, All Rights Reserved
+        </a>
+        <br />
+        <span>
+          ICP证：<a href="https://beian.miit.gov.cn" target="_blank">湘ICP备2021011090号-1</a>
+        </span>
+      </div>
     </div>
   </div>
 </template>
