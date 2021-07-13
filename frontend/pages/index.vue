@@ -13,35 +13,38 @@
             <a-icon slot="prefix" type="code" />
         </a-input>
     </a-modal>
-    <div class="container text-center warpper">
-      <img src="~assets/image/bg.png" class="logo" />
-      <h1>中医术语中英对照查询系统</h1>
-      <p class="sub-title">The System for Chinese-English Terminology of Chinese Medicine</p>
-      <a-spin :spinning="spinning">
-        <a-select v-model="rule" size="large" class="rule">
-          <a-select-option value="中 -> 英">中(CN) -> 英(EN)</a-select-option>
-          <a-select-option value="英 -> 中">英(EN) -> 中(CN)</a-select-option>
-        </a-select>
-        <a-auto-complete
-          v-model="searchKeyword"
-          :dataSource="completeResult"
-          size="large"
-          @search="autoComplete"
-          @focus="onFocus"
-          @blur="onBlur"
-          placeholder="输入关键字"
-          class="auto-complete"
-        />
-        <a-button type="primary" @click="search" size="large" class="search">搜索</a-button>
-      </a-spin>
-      <div class="copyright">
-        <a v-show="!isFocus" target="_blank" href="http://note.youdao.com/noteshare?id=3821e88b2bdc8691d666c2553f32d6e7">
-          © 中医术语中英对照查询系统 Copyright (C) CETCMS, All Rights Reserved
-        </a>
-        <br />
-        <span>
-          ICP证：<a href="https://beian.miit.gov.cn" target="_blank">湘ICP备2021011090号-1</a>
-        </span>
+    
+    <div class="container text-center">
+      <div class="warpper">
+        <img src="~assets/image/bg.png" class="logo" />
+        <h1>中医术语中英对照查询系统</h1>
+        <p class="sub-title">The System for Chinese-English Terminology of Chinese Medicine</p>
+        <a-spin :spinning="spinning">
+          <a-select v-model="rule" size="large" class="rule">
+            <a-select-option value="中 -> 英">中(CN) -> 英(EN)</a-select-option>
+            <a-select-option value="英 -> 中">英(EN) -> 中(CN)</a-select-option>
+          </a-select>
+          <a-auto-complete
+            v-model="searchKeyword"
+            :dataSource="completeResult"
+            size="large"
+            @search="autoComplete"
+            @focus="onFocus"
+            @blur="onBlur"
+            placeholder="输入关键字"
+            class="auto-complete"
+          />
+          <a-button type="primary" @click="search" size="large" class="search">搜索</a-button>
+        </a-spin>
+        <div class="copyright">
+          <a v-show="!isFocus" target="_blank" href="http://note.youdao.com/noteshare?id=3821e88b2bdc8691d666c2553f32d6e7">
+            © 中医术语中英对照查询系统 Copyright (C) CETCMS, All Rights Reserved
+          </a>
+          <br />
+          <span>
+            ICP证：<a href="https://beian.miit.gov.cn" target="_blank">湘ICP备2021011090号-1</a>
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -136,12 +139,14 @@ export default {
 a {
   text-decoration: none;
 }
+
+.warpper {
+  margin-top: 10%;
+}
+
 .submit {
   margin-top: 10px;
   margin-right: 10px;
-}
-.warpper {
-  margin-top: 50px;
 }
 .logo {
   width: 200px;
@@ -163,10 +168,11 @@ a {
   margin-left: 10px;
 }
 .copyright {
-  position: fixed;
-  bottom: 10px;
-  left: 0;
-  right: 0;
+  margin-top: 50px;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  z-index: 9999;
   text-align: center;
 }
 
